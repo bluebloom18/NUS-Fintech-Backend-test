@@ -1,40 +1,29 @@
 import express from 'express';
 
-import {createUser, getUsers, getUser, deleteUser, updateUser, getAge} from '../controllers/users.js';
-import { findAge } from '../database/pg.js';
+import {createUser, getUsers, getUser, deleteUser, updateUser, getAge, getTransactions, getTransaction} from '../controllers/users.js';
 
 const router = express.Router();
 
-router.get('/all', getUsers);
-
 //all routes here start with /users
 
-router.get('/:id',getUser);
+router.get('/users/all', getUsers);
 
-//router.get('/user',getAge);
+router.get('/users/:id',getUser);
 
-router.get('/user', async (req,res)=>{
-    console.log(req.query.age);
-    let sql = await findAge(req.query.age);
-    let users=[];
-    if (sql){      
-        for (let i in sql.rows) {
-          users[i]=sql.rows[i];
-          }
-          res.status(200).send(users);
-  
-       
-        } else {
-            res.status(404).send('No users');
-        }
-//    res.send(sql);
-});
+router.get('/users/',getAge); //?age=20 gets all uses younger than 20
 
+router.post('/users/', createUser);
 
-router.post('/', createUser);
+router.delete('/users/:id', deleteUser);
 
-router.delete('/:id', deleteUser);
+router.patch('/users/:id', updateUser);
 
-router.patch('/:id', updateUser);
+router.get('/transactions/all', getTransactions);
+
+router.get('/transactions/:id', getTransaction);
+
+router.use((error, req, res, next)=> {
+    return res.status(500).json({ error: error.toString()});
+})
 
 export default router;

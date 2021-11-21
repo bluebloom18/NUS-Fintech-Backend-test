@@ -1,4 +1,6 @@
-// this allows the require statement in ES6
+//This module does all the connection to the database
+
+// this segment allows the require statement in ES6
 //import { createRequire } from "module";
 //const require = createRequire(import.meta.url);
 
@@ -11,13 +13,12 @@ dotenv.config();
 
 //ES6
 import * as pg from 'pg'
-const { Client } = pg.default;
+//const { Client } = pg.default;
 const { Pool } = pg.default;
-
 
 // const { Client } = require('pg');
 
-const client = new Client({
+const client = new Pool({
     user: process.env.PGUSER,
     host: process.env.PGHOST,
     database: process.env.PGDATABASE,
@@ -25,53 +26,47 @@ const client = new Client({
     ssl: { rejectUnauthorized: false }
 });
 
-await client.connect();
-let res = await client.query('SELECT $1::text as message', ['Hello world!']);
-console.log(res.rows[0].message); // Hello world!
+//table variables
+const mydatabase='gb';
+const myusers='gb.user';
+const mytransactions='gb.transactions';
 
-// res =  await client.query('SELECT NOW() as now');
-res= await time();
+//columns- users
+const age = 'age';
+const uid = 'uid';
+
+//columns- transactions
+const transid = 'trans_id';
+
+let connect = await client.connect();
+//let res = 
+await connect.query('SELECT $1::text as message', ['Hello world!'])
+    .then(result => console.log(result.rows[0].message))
+    .catch(e => console.error(e.stack))
+    .then(() => connect.release());
+//console.log(res.rows[0].message); // Hello world!
+//await client.end();
+
+//time
+let res= await time();
 console.log(res.rows[0]);
 
-/*
-res= await allTables();
-for (let i in res.rows) {
-    console.log(res.rows[i]);
-}
-
-res= await allUsers();
-if (res) {
-    for (let i in res.rows) {
-        console.log(res.rows[i]);
-    }
-}
-  
-res= await allTransactions();
-if (res) {
-    for (let i in res.rows) {
-        console.log(res.rows[i]);
-    }
-}
-
-res= await findAge(30);
-if (res) {
-    for (let i in res.rows) {
-        console.log(res.rows[i]);
-    }  
-}
-*/
-
-//await client.end()
-
 export default async function time() {
+    connect = await client.connect();
     let sqlterm = 'SELECT NOW() as now';
-    let sql = await client.query(sqlterm);
-    if (sql.err) {console.error(err); }
-    else { 
-        return sql;
-    };
+    try {
+        let sql = await connect.query(sqlterm);
+        if (sql.err) {
+            console.error(err);        
+        }
+        else { 
+                return sql;
+        };
+    }
+    finally {
+        await connect.release();
+    }       
 }
-
 
 /*
 async function allUsers() {
@@ -81,82 +76,270 @@ async function allUsers() {
 }
 */
 
-async function allUsers() {
-    let sqlterm = `SELECT * from gb.user`;
-    
-    let sql = await client.query(sqlterm);
-    if (sql.err) {console.error(err); }
-    else { 
-        console.log('Fetched users');
-        return sql;
-    };
+async function allItems(item) {
+    let table;
+    switch (item){
+        case 'users': 
+            table = myusers;
+            break;
+        case 'transactions': 
+            table = mytransactions;
+            break;
+        default: table = false;
+    }
+    if (table){
+        connect = await client.connect();
+        let sqlterm = `SELECT * from ${table}`;
+        try {
+            let sql = await connect.query(sqlterm);
+            if (sql.err) {console.error(err); }
+            else { 
+                console.log(`Fetched ${item}`);
+                return sql;
+            };
+        }
+        finally {
+            await connect.release();
+        }      
+    } else {
+        return 'Error wrong parameter';
+    }
 }
 
-async function allTransactions() {
-    let sqlterm = 'SELECT * from gb.transactions';
-    let sql = await client.query(sqlterm);
-    if (sql.err) {console.error(err); }
-    else { 
-        console.log('Fetched transactions');
-        return sql;
-    };
-}
 
 async function allTables() {
-    let sqlterm = `SELECT table_name FROM information_schema.tables WHERE table_schema = 'gb' ORDER BY table_name`;
-    let sql = await client.query(sqlterm);
-    if (sql.err) {console.error(err); }
-    else { 
-        console.log('Fetched tables');
-        return sql;
-    };
+    connect = await client.connect();
+
+    let sqlterm = `SELECT table_name FROM information_schema.tables WHERE table_schema = ${mydatabase} ORDER BY table_name`;
+    try {
+        let sql = await connect.query(sqlterm);
+        if (sql.err) {console.error(err); }
+        else { 
+            console.log('Fetched tables');
+            return sql;
+        };
+    }
+    finally {
+        await connect.release();
+    }     
 }
 
-async function findAge(age) {
+async function findUserAge(myage) {
+    connect = await client.connect();
+    
     let sqlterm = `
     SELECT *
-    FROM gb.user
-    WHERE age<${age}`;
+    FROM ${myusers}
+    WHERE ${age} <${myage}`;
     
-    let sql = await client.query(sqlterm); 
-    if (sql.err) {console.error(err); }
-    else { 
-        console.log('Fetched age');
-        return sql;
-    };
+    try {
+        let sql = await connect.query(sqlterm); 
+        if (sql.err) {console.error(err); }
+        else { 
+            console.log('Fetched age');
+            return sql;
+        };
+    }
+    finally {
+        await connect.release();
+    }       
 }
 
-async function insertUser() {
-    const query = `
-    INSERT INTO users (email, firstName, lastName, age)
-    VALUES ('johndoe@gmail.com', 'john', 'doe', 21)
-    `;
-    client.query(query, (err, res) => {
-        if (err) {
-            console.error(err);
-            return;
+async function findUser(userid) {
+    connect = await client.connect();
+    
+    let sqlterm = `
+    SELECT *
+    FROM ${myusers}
+    WHERE ${uid} = ${userid}`;
+    
+    try {
+        let sql = await connect.query(sqlterm); 
+        if (sql.err) {console.error(err); }
+        else { 
+            console.log('Fetched user');
+            return sql;
+        };
+    }
+    finally {
+        await connect.release();
+    }       
+}
+
+async function findItem(index,item) {
+    let table, identity;
+    
+    switch (item){
+        case 'users': 
+            table = myusers;
+            identity = uid;
+            break;
+        case 'transactions': 
+            table = mytransactions;
+            identity = transid;
+            break;
+        default: table = false;
+    }
+    if (table){
+
+        connect = await client.connect();
+        
+        let sqlterm = `
+        SELECT *
+        FROM ${table}
+        WHERE ${identity} = ${index}`;
+        
+        try {
+            let sql = await connect.query(sqlterm); 
+            if (sql.err) {console.error(err); }
+            else { 
+                console.log(`Fetched ${item}`);
+                return sql;
+            };
         }
-        console.log('Data insert successful');
-        client.end();
-    });
+        finally {
+            await connect.release();
+        }       
+    }
+}
+
+
+
+async function insertUser(user) {
+    connect = await client.connect();
+    
+    try {
+        if(user.firstname === undefined || user.lastname === undefined || user.age === undefined || user.email === undefined || user.isparent === undefined) {
+            console.log('unable to process');
+            return ('error');
+        } else {
+                const query = `
+                INSERT INTO ${myusers} ("firstname","lastname","age","email","isparent")
+                VALUES ('${user.firstname}','${user.lastname}','${user.age}','${user.email}','${user.isparent}')`;
+                
+                let sql = await connect.query(query);
+
+                if (sql.err) {
+                        console.error(err);
+                        return 'error'
+                            
+                } else {
+                       console.log('Data insert successful');
+                       return 'ok'
+                        
+                }
+        }      
+    }
+    finally {
+        await connect.release();
+    }              
+}
+
+async function amendUser(user,id) {
+    connect = await client.connect();
+    
+    try {
+                   
+            let fields = Object.entries(user);
+            
+            let mytext=''
+            
+            for (let item=0; item < fields.length; item++) {
+                //ignore null
+                if (fields[item][1]=== null ||fields[item][1]=== undefined) {
+                    //do nothing
+                } else {
+                    mytext = mytext+ fields[item][0]+'=\''+fields[item][1]+'\', '
+                }  
+            }
+            //remove last comma
+            mytext = mytext.replace(/, $/," ");
+
+            
+                const query = `
+                UPDATE ${myusers} SET ${mytext} WHERE ${uid}=${id}`;
+                
+                let sql = await connect.query(query);
+
+                if (sql.err) {
+                        console.error(err);
+                        return 'error'
+                            
+                } else {
+                       console.log('Data update successful');
+                       return 'ok'
+                        
+                }
+        }      
+    
+    finally {
+        await connect.release();
+    }              
+}
+
+
+async function removeUser(userid) {
+    connect = await client.connect();
+    
+    let sqlterm = `
+    DELETE FROM ${myusers}
+    WHERE ${uid} = ${userid}`;
+
+    try {
+        let sql = await connect.query(sqlterm); 
+        if (sql.err) {console.error(err); }
+        else { 
+            console.log('Deleted user');
+            return sql;
+        };
+    }
+    finally {
+        await connect.release();
+    }                
 }
 
 export {
     allTables,
-    allUsers,
-    allTransactions,
-    findAge
+    allItems,
+    findUser,
+    insertUser,
+    removeUser,
+    amendUser,
+    findUserAge,
+    findItem
 };
-  
-/*
-async function time() {
-    let sql =  client.query('SELECT NOW() as now', (err, res) => {
-        if (err) {
-          console.log(err.stack);
-        } else {
+
+
+/* put unused functions here
+async function allUsers() {
+    connect = await client.connect();
+    let sqlterm = `SELECT * from ${myusers}`;
+    try {    
+        let sql = await connect.query(sqlterm);
+        if (sql.err) {console.error(err); }
+        else { 
+            console.log('Fetched users');
             return sql;
-        }
-    });
+        };
+    }
+    finally {
+        await connect.release();
+    }
+}
+
+async function allTransactions() {
+    connect = await client.connect();
+    let sqlterm = `SELECT * from ${mytransactions}`;
+    try {
+        let sql = await connect.query(sqlterm);
+        if (sql.err) {console.error(err); }
+        else { 
+            console.log('Fetched transactions');
+            return sql;
+        };
+    }
+    finally {
+        await connect.release();
+    }   
 }
 */
-

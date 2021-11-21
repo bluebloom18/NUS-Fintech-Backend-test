@@ -1,20 +1,25 @@
-import {v4 as uuidv4} from 'uuid';
-import time, { allTables, allUsers,allTransactions,findAge} from '../database/pg.js';
+// import {v4 as uuidv4} from 'uuid';
+import time, { allTables, allItems, findUserAge,findUser, removeUser, insertUser,findItem, amendUser} from '../database/pg.js';
 
-let users = [];
-//initUsers()
-
-export const createUser = (req, res) => { 
-    const user = req.body;
+export const createUser = async (req, res) => { 
+    //let users = [];
     
-    users.push({ ...user, id: uuidv4()});
-
-    res.send(`User with the name ${user.firstName} added to the database`);
-
+    const user = req.body;
+    let result = await insertUser(user);
+    if (result == 'ok') {
+        //users.push({ ...user, id: uuidv4()});
+        res.send(`User with the name ${user.firstname} ${user.lastname} added to the database`); 
+    } else {
+        res.send('Cannot add user. Check syntax');
+    }
+   
 };
 
 export const getUsers = async (req, res)=> {
-    let usertable= await allUsers();
+    let users = [];
+
+//    let usertable= await allUsers();
+    let usertable= await allItems('users');
     if (usertable) {
         for (let i in usertable.rows) {
             users[i]=usertable.rows[i];
@@ -24,21 +29,24 @@ export const getUsers = async (req, res)=> {
 };
 
 export const getUser = async (req,res) => {
+    let users = [];
+
     const {id }= req.params;
-    users=[];
-    let usertable= await allUsers();
-    if (usertable) {
-        for (let i in usertable.rows) {
-            users[i]=usertable.rows[i];
-        }
-        const foundUser = users.find((user)=> user.uid == id);
-        if (foundUser) {            
-            res.status(200).send(foundUser);   
+    //expect a positive integer
+    if (id> 0) {       
+//        let usertable = await findUser(id);
+        let usertable = await findItem(id,'transactions');
+        
+        if (usertable){      
+            for (let i in usertable.rows) {
+                users[i]=usertable.rows[i];
+            }
+            res.status(200).send(users);           
         } else {
-            res.status(404).send('Failure');
+                res.status(404).send('No users');
         }
     } else {
-        res.status(404).send('Failure');
+        res.status(404).send('Incorrect query');
     }
 };
 
@@ -52,71 +60,69 @@ export const getUser = (req,res) => {
 */
 
 
-/*
-if (!request.query.user_id) {
-      console.log("Received invalid user_id: " + request.query.user_id);
-      response.status(400).send("Received invalid user_id");
-    } else {
-      let user = database.get_user_by_user_id(request.query.user_id);
-      if (user){      
-        response.status(200).send(user);
-      } else {
-          response.status(404).send("User not found!");
-      }
-    }
-  })
-  */
+export const getAge =  async (req,res)=>{
+    let users = [];
 
-export const getAge = async (req,res) => {
-    console.log(req.query.age);
-    let usertable = await findAge(age);
-    res.status(200).send(users);
-    
-    /*
-    if (!req.query.age) {
-        console.log("Received invalid age: " + req.query.age);
-        response.status(400).send("Received invalid user_id");
-      } else {
-        console.log('getting age');
-        let usertable = await findAge(30);
+    let age=req.query.age;
+    if (age > 0) {       
+        let usertable = await findUserAge(age);
+        
         if (usertable){      
-          for (let i in usertable.rows) {
-            users[i]=usertable.rows[i];
+            for (let i in usertable.rows) {
+                users[i]=usertable.rows[i];
             }
-            res.status(200).send(users);
-    
-         
-          } else {
-              res.status(404).send('No users');
-          }
-      }
-*/
-      /*
-    const age = req.query.age;
-    console.log(age);
-    //const {age}= req.params;
-    //console.log(age);
-    let usertable= await findAge(age);
-    let users=[];
-    if (usertable) {
-        for (let i in usertable.rows) {
-            users[i]=usertable.rows[i];
+            res.status(200).send(users);           
+        } else {
+                res.status(404).send('No user with this Age');
         }
-        res.send(users);
     } else {
-        res.send('No users');
+        res.status(404).send('Incorrect query');
     }
-    */
- };
-
-export const deleteUser = (req,res) => {
-    const {id } = req.params;
-    users = users.filter((user) => user.id != id);
-    res.send(`User with the id ${id} deleted`);
 };
 
-export const updateUser = (req,res)=>{
-    const {id} = req.params;
+export const deleteUser = async (req,res) => {
+    const {id }= req.params;
+    
+    //id must be number > 0
+    if (id >0 ) {
+        //check user exists
+        let isuser = await findUser(id);
+        
+        if (isuser.rows.length > 0) {        
+            //delete
+            let usertable = await removeUser(id);
+        
+            if (usertable){       
+                res.status(200).send('User with id '+id + ' deleted');
+                //res.status(200).send(`User with the id ${id} deleted`);           
+            } else {
+                    res.status(404).send('No users');
+            }
+        } else {
+            res.status(404).send('No users');            
+        }
+    } else {
+        res.status(404).send('Incorrect query');
+    }
+    // users = users.filter((user) => user.id != id);
+};
+
+export const updateUser = async (req,res)=>{
+    //let users = [];
+    const {id }= req.params;
+    const user = req.body;
+    let result = await amendUser(user,id);
+
+    if (result == 'ok') {
+        //users.push({ ...user, id: uuidv4()});
+        res.send(`User with the ID ${id} amended`); 
+    } else {
+        res.send('Cannot update user. Check syntax');
+    }  
+};
+
+/*
+const {id} = req.params;
     const {firstName, lastName, age} = req.body;
     const user = users.find((user) => user.id == id);
 
@@ -125,9 +131,8 @@ export const updateUser = (req,res)=>{
     if(age) user.age  = age;
 
     res.send(`User with id ${id} has been updated`);
-};
 
-
+*/
 
 /*
 router.patch('/:id', (req,res)=>{
@@ -142,9 +147,9 @@ router.patch('/:id', (req,res)=>{
     res.send(`User with id ${id} has been updated`);
 });
 */
-
+/*
 async function initUsers(req, res) {
-    users =[];
+    let users =[];
     let usertable= await allUsers();
 
     if (usertable) {
@@ -153,8 +158,44 @@ async function initUsers(req, res) {
         }  
         res.send(users);   
     } else {res.send("Error")}
-
-
-
 }
+
+*/
+
+/************************** */
+//Transactions
+export const getTransactions = async (req, res)=> {
+    let users = [];
+
+    //let usertable= await allTransactions();
+    let usertable= await allItems('transactions');
+
+    if (usertable) {
+        for (let i in usertable.rows) {
+            users[i]=usertable.rows[i];
+        }  
+        res.send(users);   
+    } else {res.send("Error")}
+};
+
+export const getTransaction = async (req,res) => {
+    let users = [];
+
+    const {id }= req.params;
+    //expect a positive integer
+    if (id> 0) {       
+        let usertable = await findItem(id,'transactions');
+        
+        if (usertable){      
+            for (let i in usertable.rows) {
+                users[i]=usertable.rows[i];
+            }
+            res.status(200).send(users);           
+        } else {
+                res.status(404).send('No users');
+        }
+    } else {
+        res.status(404).send('Incorrect query');
+    }
+};
 
