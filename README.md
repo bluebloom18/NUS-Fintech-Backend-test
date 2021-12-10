@@ -31,7 +31,8 @@ Gitclone, and in the project directory, you can run:
   
 ## DOCKER
 
-### Create docker image- docker build -t <your image name> .
+Create docker image: 
+### docker build -t <your image name> .
 ### docker run -d -p 3000:3000 <your image name>
 
 
