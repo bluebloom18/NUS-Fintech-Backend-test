@@ -1,5 +1,5 @@
 {
-  "name": "midend-projct",
+  "name": "backend-test",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -16,7 +16,7 @@
     "nodemon": "^2.0.15"
   },
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
