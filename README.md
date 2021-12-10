@@ -24,9 +24,9 @@ https://dev.to/rohit19060/how-to-write-stunning-github-readme-md-template-provid
 
 ## Available Commands
 
-In the project directory, you can run:
+Gitclone, and in the project directory, you can run:
 
-### `npm start" 
+### "npm start" 
   
 ## DOCKER
 
@@ -41,6 +41,9 @@ In the project directory, you can run:
 - NPM
 - Docker on VS code
 
+## Screenshot
+![](screenshot.png)
+  
 ## Future Updates
 
 - Front End using React
