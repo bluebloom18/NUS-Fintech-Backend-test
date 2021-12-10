@@ -1,6 +1,5 @@
 # backend-test
 This is a test backend server with APIs running on port 3000 based on a tutorial
-Making a small change here
 
 The database is linked to a real Posgres database. 
 
@@ -33,7 +32,7 @@ Gitclone, and in the project directory, you can run:
 
 Create docker image: 
 ### docker build -t image-name .
-### docker run -d -p 3000:3000 image-name
+### docker run -d -p 3000:3000 --env-file .env image-name
 
 
 ## Built With
