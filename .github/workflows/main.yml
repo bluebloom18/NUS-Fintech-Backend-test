@@ -35,6 +35,14 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
 
+      # Build enviroment
+      - name: Build .env file
+        run: |
+          echo "${{secrets.PGHOST}}" > .env          
+          echo "${{secrets.PGUSER}}" > .env          
+          echo "${{secrets.PGPASSWPRD}}" > .env          
+          echo "${{secrets.PGDATABASE}}" > .env
+          
      # Runs Docker
       - name: Build and push docker image
         uses: mr-smithers-excellent/docker-build-push@v5
