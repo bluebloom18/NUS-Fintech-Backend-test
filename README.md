@@ -20,6 +20,8 @@ https://dev.to/rohit19060/how-to-write-stunning-github-readme-md-template-provid
 - [Live] (https://bluebloom18.github.io/NUS-Fintech-Backend-test/ "Live View")
 
 - [API] (https://bluebloom18.github.io/NUS-Fintech-Backend-test/ "API")
+  
+- [Docker Hub] (https://hub.docker.com/repository/docker/bluebloom9876/nus-fintech-backend-test/general) "Docker Hub")
 
 
 ## Available Commands
