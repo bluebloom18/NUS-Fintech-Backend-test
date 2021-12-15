@@ -17,7 +17,7 @@ https://dev.to/rohit19060/how-to-write-stunning-github-readme-md-template-provid
 
 - [Repo] (https://github.com/bluebloom18/NUS-Fintech-Backend-test.git "Repo")
 
-- [Live] (http://35.184.167.96 "Live View- under construction")
+- [Live] (http://bluebloom.star.is/")
 
 - [API] (https://bluebloom18.github.io/NUS-Fintech-Backend-test/ "API")
   
