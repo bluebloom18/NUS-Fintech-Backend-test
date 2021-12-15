@@ -35,7 +35,7 @@ export const getUser = async (req,res) => {
     //expect a positive integer
     if (id> 0) {       
 //        let usertable = await findUser(id);
-        let usertable = await findItem(id,'transactions');
+        let usertable = await findItem(id,'users');
         
         if (usertable){      
             for (let i in usertable.rows) {
