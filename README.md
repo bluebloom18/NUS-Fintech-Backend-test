@@ -25,24 +25,23 @@ https://dev.to/rohit19060/how-to-write-stunning-github-readme-md-template-provid
 
 ## Github Actions
 When code is updated
-1. Build .env file from secrets
+1. Build Docker .env file from secrets
 2. Build and push to Docker Hub when code changes
   
-## Available Commands
+## To replicate and run
 
-Gitclone, and in the project directory, you can run:
-
+Gitclone, and in the project directory, you can run (but you need .env file):
 ### "npm start" 
   
-## DOCKER
+## DOCKER Workflow
 
 Create docker image: 
 ### docker build -t image-name .
 ### docker run -d -p 3000:3000 --env-file .env image-name
 
 ## Live Site
-Hosted on Google Cloud Platform
-Files pulled using git clone and then run using Docker
+- Hosted on Google Cloud Platform
+- Files pulled using git clone and then run using Docker
 
 ## Built With
 
