@@ -24,6 +24,10 @@ https://dev.to/rohit19060/how-to-write-stunning-github-readme-md-template-provid
 - [Docker Hub] (https://hub.docker.com/repository/docker/bluebloom9876/nus-fintech-backend-test/general) "Docker Hub")
 
 
+## Github Actions
+  
+Pushing to Docker Hub when code changes
+  
 ## Available Commands
 
 Gitclone, and in the project directory, you can run:
