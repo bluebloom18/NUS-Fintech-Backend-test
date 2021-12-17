@@ -44,7 +44,7 @@ Run:
 
 ## Live Site
 - Hosted on Google Cloud Platform
-- Files pulled using git clone and then run using Docker
+- Files pulled using git clone and then run using Docker (you need a .env file to access the database)
 
 ## Built With
 
