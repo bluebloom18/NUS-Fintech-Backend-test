@@ -23,10 +23,10 @@ https://dev.to/rohit19060/how-to-write-stunning-github-readme-md-template-provid
   
 - [Docker Hub] (https://hub.docker.com/repository/docker/bluebloom9876/nus-fintech-backend-test/general) "Docker Hub")
 
-
 ## Github Actions
-  
-Pushing to Docker Hub when code changes
+When code is updated
+1. Build .env file from secrets
+2. Build and push to Docker Hub when code changes
   
 ## Available Commands
 
@@ -40,6 +40,9 @@ Create docker image:
 ### docker build -t image-name .
 ### docker run -d -p 3000:3000 --env-file .env image-name
 
+## Live Site
+Hosted on Google Cloud Platform
+Files pulled using git clone and then run using Docker
 
 ## Built With
 
