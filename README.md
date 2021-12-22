@@ -23,19 +23,28 @@ https://dev.to/rohit19060/how-to-write-stunning-github-readme-md-template-provid
   
 - [Docker Hub] (https://hub.docker.com/repository/docker/bluebloom9876/nus-fintech-backend-test/general) "Docker Hub")
 
-
-## Available Commands
-
-Gitclone, and in the project directory, you can run:
-
-### "npm start" 
+## Github Actions
   
-## DOCKER
+When code is updated
+1. Build Docker .env file from secrets
+2. Build and push to Docker Hub when code changes
+(yaml file here: .github/workflows/main.yml)
+  
+## To replicate and run
+
+Gitclone, and in the project directory, you can run (but you need .env file):
+  ### "npm start" 
+  
+## DOCKER Workflow
 
 Create docker image: 
-### docker build -t image-name .
-### docker run -d -p 3000:3000 --env-file .env image-name
+  ### docker build -t image-name .
+Run: 
+  ### docker run -d -p 80:3000 --env-file .env image-name
 
+## Live Site
+- Hosted on Google Cloud Platform
+- Files pulled using git clone and then run using Docker (you need a .env file to access the database)
 
 ## Built With
 
